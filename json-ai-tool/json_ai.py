@@ -62,13 +62,50 @@ class JSONAITool:
 
         print("✓ Model yüklendi (GPU)")
 
-    def _generate(self, prompt: str, max_tokens: int = 2048) -> str:
+    def _generate(self, prompt: str, max_tokens: int = 2048, mode: str = "default") -> str:
         """AI ile text üret"""
         if not self.use_ai:
             return "AI devre dışı (--no-ai)"
 
+        # Farklı modlar için farklı system promptlar
+        system_prompts = {
+            "default": "You are a JSON expert assistant. Always respond with valid JSON when generating data.",
+            "explain": """You are an educational JSON expert. When you analyze errors:
+1. EXPLAIN what the error is in simple terms
+2. EXPLAIN why it's wrong
+3. SHOW how to fix it step by step
+4. PROVIDE the corrected version
+5. TEACH best practices
+
+Always be clear, detailed, and educational. Use Turkish when appropriate.""",
+            "code": """You are a coding instructor specializing in JSON and Python.
+When asked to generate data:
+1. EXPLAIN the task
+2. PROVIDE working Python code with comments
+3. SHOW example output
+4. EXPLAIN the approach
+5. SUGGEST improvements
+
+Format your response as:
+## Açıklama
+[explanation]
+
+## Python Kodu
+```python
+[code]
+```
+
+## Örnek Çıktı
+[example]
+
+## İpuçları
+[tips]"""
+        }
+
+        system_content = system_prompts.get(mode, system_prompts["default"])
+
         messages = [
-            {"role": "system", "content": "You are a JSON expert assistant. Always respond with valid JSON when generating data."},
+            {"role": "system", "content": system_content},
             {"role": "user", "content": prompt}
         ]
 
@@ -170,35 +207,51 @@ class JSONAITool:
 
     def _fix_with_ai(self, broken_json: str) -> Dict:
         """AI ile JSON düzelt"""
-        prompt = f"""Fix this broken JSON and return ONLY the valid JSON:
+        prompt = f"""Analyze this broken JSON and help me understand and fix it:
 
+```json
 {broken_json}
+```
 
-Return only valid JSON, no explanations."""
+Please:
+1. Identify ALL errors
+2. Explain WHAT each error is
+3. Explain WHY it's wrong
+4. Show HOW to fix it
+5. Provide the corrected JSON
 
-        response = self._generate(prompt, max_tokens=4096)
+Be educational and detailed."""
 
-        # Extract JSON from response
-        json_match = re.search(r'\{[\s\S]*\}|\[[\s\S]*\]', response)
-        if json_match:
+        response = self._generate(prompt, max_tokens=4096, mode="explain")
+
+        # Extract JSON from response (en son JSON bloğunu al)
+        json_matches = re.findall(r'\{[\s\S]*?\}|\[[\s\S]*?\]', response)
+        fixed_json = None
+
+        # Geriye doğru ara - en temiz JSON'u bul
+        for match in reversed(json_matches):
             try:
-                fixed = json_match.group(0)
-                data = json.loads(fixed)
-                return {
-                    "success": True,
-                    "original": broken_json,
-                    "fixed": fixed,
-                    "data": data,
-                    "method": "AI",
-                    "message": "✓ AI ile düzeltildi"
-                }
+                data = json.loads(match)
+                fixed_json = match
+                break
             except:
-                pass
+                continue
+
+        if fixed_json:
+            return {
+                "success": True,
+                "original": broken_json,
+                "fixed": fixed_json,
+                "data": data,
+                "method": "AI",
+                "explanation": response,  # TAM AÇIKLAMA
+                "message": "✓ AI ile düzeltildi ve açıklandı"
+            }
 
         return {
             "success": False,
-            "message": "❌ AI de düzeltemedi",
-            "ai_response": response
+            "message": "❌ AI JSON çıkaramadı",
+            "explanation": response  # Yine de açıklamayı göster
         }
 
     def analyze(self, json_input: Union[str, dict]) -> Dict:
@@ -243,36 +296,39 @@ Return only valid JSON, no explanations."""
             return self._generate_basic(count, data_type)
 
     def _generate_with_ai(self, count: int, data_type: str) -> Dict:
-        """AI ile veri üret"""
-        prompt = f"""Generate {count} realistic {data_type} records in JSON format.
+        """AI ile veri üret - KOD ÜRETİR"""
+        prompt = f"""I need to generate {count} realistic {data_type} records.
 
-Requirements:
-- Each record should have realistic values
-- Use proper data types
-- Include variety
+Please help me by:
+1. Explaining what fields make sense for {data_type} data
+2. Providing clean, reusable Python code to generate this data
+3. Showing 2-3 example records
+4. Suggesting how to make the data more realistic
 
-Return ONLY a JSON array, no explanations."""
+Generate code that I can run myself, not just the final JSON."""
 
-        response = self._generate(prompt, max_tokens=4096)
+        response = self._generate(prompt, max_tokens=4096, mode="code")
 
-        # Extract JSON
-        json_match = re.search(r'\[[\s\S]*\]', response)
+        # Python kodunu çıkar
+        code_match = re.search(r'```python\n([\s\S]*?)```', response)
+        python_code = code_match.group(1) if code_match else None
+
+        # JSON varsa çıkar (opsiyonel)
+        json_match = re.search(r'\[[\s\S]*?\]', response)
+        example_data = None
         if json_match:
             try:
-                data = json.loads(json_match.group(0))
-                return {
-                    "success": True,
-                    "count": len(data),
-                    "data": data,
-                    "method": "AI"
-                }
+                example_data = json.loads(json_match.group(0))
             except:
                 pass
 
         return {
-            "success": False,
-            "message": "AI JSON üretemedi",
-            "raw_response": response
+            "success": True,
+            "method": "AI-Code",
+            "explanation": response,  # TAM AÇIKLAMA
+            "python_code": python_code,  # ÇALIŞTIRILAB İLİR KOD
+            "example_data": example_data,  # ÖRNEK
+            "message": "✓ AI kod ve açıklama üretti"
         }
 
     def _generate_basic(self, count: int, data_type: str) -> Dict:
@@ -455,6 +511,53 @@ Return ONLY a JSON array, no explanations."""
             return {"type": "string"}
 
 
+def _print_smart_output(result: Dict, pretty: bool = False):
+    """Akıllı output - açıklamaları güzel göster"""
+
+    # Eğer explanation varsa, ÖNCE onu göster
+    if "explanation" in result:
+        print("\n" + "="*60)
+        print("📚 AI AÇIKLAMASI")
+        print("="*60)
+        print(result["explanation"])
+        print("="*60 + "\n")
+
+    # Eğer Python kodu varsa, ÖNCE onu göster
+    if "python_code" in result and result["python_code"]:
+        print("\n" + "="*60)
+        print("🐍 PYTHON KODU (Kopyala-Yapıştır-Çalıştır)")
+        print("="*60)
+        print("```python")
+        print(result["python_code"])
+        print("```")
+        print("="*60 + "\n")
+
+    # Sonuç özeti
+    if "message" in result:
+        print(f"\n✨ {result['message']}\n")
+
+    # JSON data varsa göster (ama kısalt)
+    if "data" in result:
+        data = result["data"]
+        if isinstance(data, list) and len(data) > 5:
+            print(f"📊 İlk 3 kayıt (toplam {len(data)}):")
+            print(json.dumps(data[:3], indent=2, ensure_ascii=False))
+            print(f"... ve {len(data) - 3} kayıt daha")
+        elif "data" in result:
+            print("📊 Data:")
+            print(json.dumps(data, indent=2, ensure_ascii=False))
+
+    # Fixed JSON varsa göster
+    if "fixed" in result:
+        print("\n✅ Düzeltilmiş JSON:")
+        print(result["fixed"])
+
+    # Diğer bilgiler
+    if pretty:
+        print("\n📋 Tam Detay:")
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="JSON AI Tool - Qwen 2.5 7B ile offline JSON işlemleri",
@@ -542,16 +645,15 @@ def main():
             data_type=args.type
         )
 
-    # Output
-    indent = 2 if args.pretty else None
-    output_json = json.dumps(result, indent=indent, ensure_ascii=False)
-
+    # Output - AKILLI GÖSTER
     if args.output:
+        # Dosyaya kaydet
         with open(args.output, 'w', encoding='utf-8') as f:
-            f.write(output_json)
+            f.write(json.dumps(result, indent=2, ensure_ascii=False))
         print(f"✓ Sonuç kaydedildi: {args.output}")
     else:
-        print(output_json)
+        # Ekrana yazdır - AKILLI FORMAT
+        _print_smart_output(result, args.pretty)
 
 
 if __name__ == "__main__":
