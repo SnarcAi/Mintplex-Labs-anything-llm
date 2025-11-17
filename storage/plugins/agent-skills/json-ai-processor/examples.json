@@ -1,0 +1,250 @@
+{
+  "examples": [
+    {
+      "name": "JSON Validation",
+      "description": "Validate JSON syntax and structure",
+      "operation": "validate",
+      "input": {
+        "name": "John Doe",
+        "email": "john@example.com",
+        "age": 30,
+        "active": true
+      },
+      "command": "Validate this JSON for syntax errors",
+      "expectedOutput": "JSON is valid"
+    },
+    {
+      "name": "JSON Error Fixing",
+      "description": "Automatically fix common JSON errors",
+      "operation": "fix",
+      "brokenInput": "{\"name\": \"test\", \"age\": 25,}",
+      "command": "Fix the errors in this JSON: {\"name\": \"test\", \"age\": 25,}",
+      "expectedFix": {
+        "name": "test",
+        "age": 25
+      }
+    },
+    {
+      "name": "Schema Inference",
+      "description": "Infer JSON Schema from data",
+      "operation": "infer_schema",
+      "input": {
+        "id": 1,
+        "email": "user@example.com",
+        "age": 25,
+        "tags": ["premium", "active"]
+      },
+      "command": "Generate a JSON Schema from this data",
+      "expectedSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "email": { "type": "string", "format": "email" },
+          "age": { "type": "integer" },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "name": "Generate User Data",
+      "description": "Generate realistic user data",
+      "operation": "generate",
+      "count": 100,
+      "dataType": "users",
+      "command": "Generate 100 realistic user records with id, name, email, age, and address",
+      "options": {
+        "count": 100,
+        "dataType": "users",
+        "realism": "high"
+      }
+    },
+    {
+      "name": "Generate Product Data",
+      "description": "Generate product catalog data",
+      "operation": "generate",
+      "count": 500,
+      "dataType": "products",
+      "command": "Generate 500 product records with SKU, name, price, stock, and ratings",
+      "options": {
+        "count": 500,
+        "dataType": "products",
+        "realism": "high"
+      }
+    },
+    {
+      "name": "Generate Transaction Data",
+      "description": "Generate transaction/order data",
+      "operation": "generate",
+      "count": 1000,
+      "dataType": "transactions",
+      "command": "Generate 1000 transaction records with items, pricing, and shipping details",
+      "options": {
+        "count": 1000,
+        "dataType": "transactions",
+        "realism": "high"
+      }
+    },
+    {
+      "name": "Generate Log Data",
+      "description": "Generate system log entries",
+      "operation": "generate",
+      "count": 2000,
+      "dataType": "logs",
+      "command": "Generate 2000 system log entries with different severity levels",
+      "options": {
+        "count": 2000,
+        "dataType": "logs",
+        "realism": "high"
+      }
+    },
+    {
+      "name": "Generate Time Series",
+      "description": "Generate time series data",
+      "operation": "generate",
+      "count": 1000,
+      "dataType": "timeseries",
+      "command": "Generate 1000 time series data points with timestamps and values",
+      "options": {
+        "count": 1000,
+        "dataType": "timeseries",
+        "variability": 0.7
+      }
+    },
+    {
+      "name": "Template-based Generation",
+      "description": "Generate data from template",
+      "operation": "generate",
+      "template": {
+        "userId": "{{index}}",
+        "username": "user{{index}}",
+        "email": "user{{index}}@example.com",
+        "uuid": "{{uuid}}",
+        "registeredAt": "{{timestamp}}",
+        "score": "{{random}}"
+      },
+      "command": "Generate 500 records using this template",
+      "options": {
+        "count": 500,
+        "template": {
+          "userId": "{{index}}",
+          "username": "user{{index}}",
+          "email": "user{{index}}@example.com",
+          "uuid": "{{uuid}}",
+          "registeredAt": "{{timestamp}}",
+          "score": "{{random}}"
+        }
+      }
+    },
+    {
+      "name": "JSONL Processing",
+      "description": "Process JSON Lines format",
+      "operation": "jsonl",
+      "input": "{\"id\":1,\"value\":100}\n{\"id\":2,\"value\":200}\n{\"id\":3,\"value\":300}",
+      "command": "Process this JSONL data and provide analysis",
+      "expectedOutput": "3 valid records processed"
+    },
+    {
+      "name": "JSON Analysis",
+      "description": "Deep structure analysis",
+      "operation": "analyze",
+      "input": {
+        "users": [
+          { "id": 1, "name": "Alice" },
+          { "id": 2, "name": "Bob" }
+        ],
+        "settings": {
+          "theme": "dark",
+          "notifications": true
+        },
+        "metadata": {
+          "version": "1.0.0",
+          "created": "2024-01-01"
+        }
+      },
+      "command": "Analyze the structure and provide insights",
+      "expectedAnalysis": ["depth", "keys", "size", "recommendations"]
+    },
+    {
+      "name": "Schema Validation",
+      "description": "Validate data against schema",
+      "operation": "validate",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "email": { "type": "string", "format": "email" }
+        },
+        "required": ["id", "email"]
+      },
+      "input": {
+        "id": 1,
+        "email": "test@example.com"
+      },
+      "command": "Validate this data against the schema",
+      "expectedOutput": "Valid according to schema"
+    }
+  ],
+  "templates": {
+    "user": {
+      "id": "{{index}}",
+      "username": "user{{index}}",
+      "email": "user{{index}}@example.com",
+      "firstName": "User",
+      "lastName": "{{index}}",
+      "age": 25,
+      "active": true,
+      "registeredAt": "{{timestamp}}",
+      "uuid": "{{uuid}}"
+    },
+    "product": {
+      "id": "{{index}}",
+      "sku": "SKU-{{random}}",
+      "name": "Product {{index}}",
+      "price": 99.99,
+      "inStock": true,
+      "quantity": 100,
+      "category": "Electronics",
+      "createdAt": "{{timestamp}}"
+    },
+    "transaction": {
+      "transactionId": "TXN-{{uuid}}",
+      "userId": "{{random}}",
+      "amount": 199.99,
+      "currency": "USD",
+      "status": "completed",
+      "timestamp": "{{timestamp}}"
+    },
+    "log": {
+      "timestamp": "{{timestamp}}",
+      "level": "INFO",
+      "service": "api-gateway",
+      "message": "Request processed successfully",
+      "traceId": "{{uuid}}",
+      "duration": 123
+    }
+  },
+  "schemas": {
+    "user": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "username": { "type": "string", "minLength": 3 },
+        "email": { "type": "string", "format": "email" },
+        "age": { "type": "integer", "minimum": 18, "maximum": 120 },
+        "active": { "type": "boolean" }
+      },
+      "required": ["id", "username", "email"]
+    },
+    "product": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "sku": { "type": "string", "pattern": "^SKU-[0-9]+$" },
+        "name": { "type": "string" },
+        "price": { "type": "number", "minimum": 0 },
+        "inStock": { "type": "boolean" }
+      },
+      "required": ["id", "sku", "name", "price"]
+    }
+  }
+}

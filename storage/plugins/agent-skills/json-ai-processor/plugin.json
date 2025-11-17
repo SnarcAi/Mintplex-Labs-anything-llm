@@ -1,0 +1,30 @@
+{
+  "active": true,
+  "hubId": "json-ai-processor",
+  "name": "JSON AI Processor",
+  "schema": "skill-1.0.0",
+  "version": "1.0.0",
+  "description": "Advanced offline JSON/JSONL analyzer, validator, error fixer, and intelligent data generator. Supports schema inference, syntax repair, and bulk data generation.",
+  "author": "Custom",
+  "license": "MIT",
+  "setup_args": {},
+  "entrypoint": {
+    "file": "handler.js",
+    "params": {
+      "operation": {
+        "description": "Operation to perform: validate, fix, analyze, generate, infer_schema, transform, or batch_generate",
+        "type": "string"
+      },
+      "json_input": {
+        "description": "JSON or JSONL string to process",
+        "type": "string"
+      },
+      "options": {
+        "description": "Additional options as JSON string (e.g., {\"count\": 1000, \"template\": {...}})",
+        "type": "string"
+      }
+    }
+  },
+  "imported": true,
+  "memory": []
+}
