@@ -1,0 +1,24 @@
+# JSON AI Tool Requirements
+# Python 3.13+ için test edildi
+
+# Core
+torch>=2.1.0
+transformers>=4.36.0
+
+# Fine-tuning
+peft>=0.7.0
+datasets>=2.16.0
+accelerate>=0.25.0
+bitsandbytes>=0.41.0  # Optional: 8-bit optimization
+
+# Utilities
+sentencepiece>=0.1.99
+protobuf>=3.20.0
+
+# Optional: faster inference
+optimum>=1.16.0
+einops>=0.7.0
+
+# Development
+ipython
+jupyter
