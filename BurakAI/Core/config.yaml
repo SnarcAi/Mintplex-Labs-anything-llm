@@ -1,0 +1,278 @@
+# ═══════════════════════════════════════════════════════
+# BurakAI - Pragmatic NEXUS Configuration
+# Version: 1.0.0 - "TEK GERÇEK"
+# ═══════════════════════════════════════════════════════
+
+system:
+  name: "BurakAI"
+  version: "1.0.0"
+  owner: "Burak Kumuk"
+  language: "tr-TR"
+  timezone: "Europe/Istanbul"
+
+  # Paths (relative to BurakAI root)
+  home: "."
+  brain_dir: "Brain"
+  core_dir: "Core"
+  factory_dir: "Factory"
+  tools_dir: "Tools"
+
+# ═══════════════════════════════════════════════════════
+# MODEL CONFIGURATION
+# ═══════════════════════════════════════════════════════
+models:
+  # Base model (change this to your actual model)
+  base:
+    name: "Qwen/Qwen2.5-7B-Instruct"
+    path: "Core/models/base"
+    type: "causal_lm"
+
+  # Current active model
+  current:
+    name: "snarcai_v7"
+    path: "Core/models/current.safetensors"
+    base_model: "Qwen/Qwen2.5-7B-Instruct"
+
+  # Backup/rollback model
+  previous:
+    name: "snarcai_v6"
+    path: "Core/models/previous.safetensors"
+    base_model: "Qwen/Qwen2.5-7B-Instruct"
+
+  # Profile-specific LoRA adapters
+  profiles:
+    finance:
+      path: "Core/profiles/finance.safetensors"
+      description: "CFO/Marj/Kâr uzmanı"
+      priority: 1
+
+    compliance:
+      path: "Core/profiles/compliance.safetensors"
+      description: "ADR/HS kodu/Zeeman uzmanı"
+      priority: 2
+
+    operations:
+      path: "Core/profiles/operations.safetensors"
+      description: "E-posta/İçerik/Müşteri"
+      priority: 3
+
+# ═══════════════════════════════════════════════════════
+# INFERENCE CONFIGURATION
+# ═══════════════════════════════════════════════════════
+inference:
+  # Hardware
+  device: "auto"  # auto, cuda, cpu
+  dtype: "float16"  # float16, float32, bfloat16
+  vram_limit_gb: 14  # Safety margin for 16GB GPU
+
+  # Model parameters
+  max_seq_len: 2048
+  batch_size: 1
+  use_flash_attention: true
+
+  # Generation parameters
+  generation:
+    max_new_tokens: 512
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 50
+    repetition_penalty: 1.06
+    do_sample: true
+
+  # Profile-specific overrides
+  profile_overrides:
+    finance:
+      temperature: 0.3  # Precise calculations
+      max_new_tokens: 1024
+
+    compliance:
+      temperature: 0.2  # Legal accuracy
+      max_new_tokens: 768
+
+    operations:
+      temperature: 0.7  # Creative content
+      max_new_tokens: 512
+
+# ═══════════════════════════════════════════════════════
+# PERFORMANCE TARGETS
+# ═══════════════════════════════════════════════════════
+performance:
+  targets:
+    latency_p95_sec: 2.0
+    throughput_tok_sec: 20
+    oom_rate: 0
+    cache_hit_rate: 0.4
+
+  strategies:
+    instant:
+      max_latency_ms: 10
+      cost: 0
+
+    fast:
+      max_latency_ms: 200
+      model: "nano"  # Future: lighter model
+
+    smart:
+      max_latency_ms: 1500
+      model: "current"
+      tools_max: 3
+
+    deep:
+      max_latency_ms: 5000
+      model: "current"
+      tools_max: 10
+
+# ═══════════════════════════════════════════════════════
+# BRAIN CONFIGURATION
+# ═══════════════════════════════════════════════════════
+brain:
+  # Context management
+  context:
+    file: "Brain/context.yaml"
+    auto_load: true
+
+  # Memory system
+  memory:
+    file: "Brain/memory.jsonl"
+    max_entries: 10000
+    auto_analyze: true
+    analyze_interval_days: 7
+
+  # Intent detection
+  intents:
+    file: "Brain/intents.py"
+    mode: "rule_based"  # rule_based or ml (future)
+
+  # Caching
+  cache:
+    enabled: true
+    ttl_seconds: 300  # 5 minutes
+    max_size_mb: 100
+
+# ═══════════════════════════════════════════════════════
+# FACTORY CONFIGURATION
+# ═══════════════════════════════════════════════════════
+factory:
+  # Directories
+  tasks_dir: "Factory/tasks"
+  outputs_dir: "Factory/outputs"
+  datasets_dir: "Factory/datasets"
+
+  # Daily automation
+  automation:
+    enabled: true
+    schedule_time: "06:00"
+    tasks_file: "Factory/tasks/daily.yaml"
+
+  # Value tracking
+  value_tracking:
+    enabled: true
+    currency: "TRY"
+    output_file: "Factory/outputs/value_log.jsonl"
+
+# ═══════════════════════════════════════════════════════
+# TOOLS CONFIGURATION
+# ═══════════════════════════════════════════════════════
+tools:
+  # Referee (margin calculator)
+  referee:
+    enabled: true
+    script: "Tools/referee_margin.py"
+
+  # OCR
+  ocr:
+    enabled: true
+    engine: "tesseract"  # tesseract, paddleocr
+    languages: ["tur", "eng"]
+
+  # Document parsing
+  documents:
+    pdf_enabled: true
+    excel_enabled: true
+    word_enabled: true
+
+  # External APIs (disabled by default - offline mode)
+  external:
+    enabled: false
+    fx_rates: false
+    web_search: false
+
+# ═══════════════════════════════════════════════════════
+# SECURITY & PRIVACY
+# ═══════════════════════════════════════════════════════
+security:
+  # Offline mode (no external data)
+  offline_mode: true
+
+  # PII protection
+  log_pii: false
+  redact_sensitive: true
+
+  # Sensitive data patterns (auto-reject)
+  sensitive_patterns:
+    - "şifre"
+    - "password"
+    - "token"
+    - "api[_-]?key"
+    - "secret"
+
+  # Model safety
+  models_readonly: true  # Prevent accidental model corruption
+
+# ═══════════════════════════════════════════════════════
+# LOGGING
+# ═══════════════════════════════════════════════════════
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "Factory/outputs/logs/burakai.log"
+  max_size_mb: 50
+  backup_count: 3
+
+  # Log to console
+  console: true
+
+  # Performance logging
+  log_latency: true
+  log_cache_hits: true
+  log_tool_usage: true
+
+# ═══════════════════════════════════════════════════════
+# PROFILES (Default behavior)
+# ═══════════════════════════════════════════════════════
+profiles:
+  default: "finance"  # Start with finance profile
+
+  auto_switch: true  # Auto-detect profile from query
+
+  # Profile definitions (detailed config in Brain/context.yaml)
+  available:
+    - finance
+    - compliance
+    - operations
+
+# ═══════════════════════════════════════════════════════
+# CONSTITUTION (Core principles)
+# ═══════════════════════════════════════════════════════
+constitution:
+  rules:
+    - "ASLA TAHMİN ETME - Veri yoksa 'yetersiz veri' de"
+    - "Gizli veri (şifre/token) asla gösterilmez"
+    - "Hesaplamalarda Python/doğrulama önceliklidir"
+    - "Varsayılan dil: Türkçe - kısa, net, sayı odaklı"
+    - "SnarcAI dinlenme önermez (kullanıcı talep etmedikçe)"
+    - "Her sayısal yanıt şeffaf, adım adım olmalı"
+    - "Kanıtlanmış formül ve kullanıcı verisi yoksa hesaplama yapma"
+
+  rejection_policy:
+    on_sensitive_data: "Üzgünüm, bu isteği yerine getirmem. (Gizli veri politikası)"
+    on_insufficient_data: "Bu hesaplama için yeterli veri yok. Eksik alanlar: {fields}"
+    on_ambiguity: "Soru belirsiz. Lütfen şunları netleştir: {ambiguities}"
+
+# ═══════════════════════════════════════════════════════
+# METADATA
+# ═══════════════════════════════════════════════════════
+metadata:
+  created: "2025-10-31"
+  last_updated: "2025-10-31"
+  author: "Burak Kumuk"
+  project: "BurakAI / SnarcAI"

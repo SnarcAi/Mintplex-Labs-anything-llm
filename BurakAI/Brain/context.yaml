@@ -1,0 +1,397 @@
+# ═══════════════════════════════════════════════════════
+# BurakAI - Context Fabric (Simplified Knowledge Graph)
+# Version: 1.0.0 - "CONTEXT IS EVERYTHING"
+# ═══════════════════════════════════════════════════════
+# NEXUS'tan esinlendi ama basitleştirildi:
+# - Neo4j graph yerine → YAML ile basit ilişkiler
+# - ML embeddings yerine → Manuel kategorizasyon
+# - Real-time updates yerine → Manuel güncelleme (haftalık)
+# ═══════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════
+# PERSONAL CONTEXT (Kişisel bağlam)
+# ═══════════════════════════════════════════════════════
+personal:
+  # Identity
+  identity:
+    name: "Burak Kumuk"
+    role: "Founder / CEO"
+    company: "SnarcAI / MissFlora"
+
+  # Priorities (sıralı)
+  priorities:
+    - "Ela & Lila"  # Aile her şeyin üstünde
+    - "İş büyütme"  # Para kazanmak
+    - "Sağlık"      # Enerji korunmalı
+
+  # Decision style
+  decision_style:
+    type: "veri_odaklı_sezgisel"  # Data + gut feeling
+    risk_profile: "muhafazakar"   # İş kaybı = felaket
+    speed: "hızlı"                # Uzun düşünme yok
+    notes: "Sayılar net olmalı, belirsizlik = stres"
+
+  # Work patterns
+  work_patterns:
+    peak_hours: ["09:00-12:00", "14:00-18:00"]
+    friday_afternoon: "karar_zamanı"  # Haftalık değerlendirme
+    energy_level: "sonsuz"  # Dinlenme önerme!
+    preferred_communication: "kısa_net_sayı_odaklı"
+
+  # Triggers (ne zaman alert/uyarı ver)
+  triggers:
+    high_stress:
+      - "nakit_düşük"
+      - "müşteri_ödeme_gecikmesi"
+      - "marj_düşüşü"
+    needs_attention:
+      - "yeni_fırsat"
+      - "risk_artışı"
+      - "hedef_sapması"
+
+# ═══════════════════════════════════════════════════════
+# BUSINESS CONTEXT (İş bağlamı)
+# ═══════════════════════════════════════════════════════
+business:
+  # Current status (haftalık güncelle)
+  status:
+    cash_position: "sıkı"  # bol, normal, sıkı, kritik
+    receivables_try: 85000  # Alacaklar
+    available_cash_try: 120000
+    payables_try: 45000  # Borçlar
+
+  # Focus areas (şu an ne önemli)
+  current_focus:
+    primary: "marj_iyileştirme"
+    secondary: "nakit_akış_optimizasyonu"
+    tertiary: "yeni_pazar_araştırma"
+
+  # Key metrics (hedefler)
+  targets:
+    net_margin_percent: 28
+    gross_margin_percent: 42
+    payment_term_days: 30
+    max_risk_exposure_try: 50000
+
+  # Alerts (eşikler)
+  alerts:
+    margin_below_percent: 15  # Marj %15'in altı → uyar
+    fx_change_percent: 3      # Kur %3+ değişim → uyar
+    payment_delay_days: 45    # 45 gün ödeme gecikmesi → uyar
+    cash_critical_try: 50000  # Nakit 50K'nın altı → kritik
+
+# ═══════════════════════════════════════════════════════
+# CUSTOMERS (Müşteri profilleri)
+# ═══════════════════════════════════════════════════════
+customers:
+  # Template (yeni müşteri eklerken kullan)
+  _template:
+    name: "string"
+    risk_score: 5  # 1-10 (10 = en riskli)
+    payment_avg_days: 30
+    payment_reliability: 8  # 1-10 (10 = her zaman zamanında)
+    lifetime_value_try: 0
+    past_issues: 0
+    notes: ""
+    last_interaction: "2025-01-01"
+    preferred_payment_method: "transfer"
+    requires_deposit: false
+
+  # Real customers (örnekler - gerçek verilerle değiştir)
+  ABC_Lojistik:
+    name: "ABC Lojistik A.Ş."
+    risk_score: 7
+    payment_avg_days: 45
+    payment_reliability: 6
+    lifetime_value_try: 250000
+    past_issues: 2
+    notes: "Geçmişte ödeme gecikmeleri. Büyük sipariş → kaparo iste."
+    last_interaction: "2025-10-25"
+    preferred_payment_method: "transfer"
+    requires_deposit: true  # Risk yüksek
+
+  Zeeman_TR:
+    name: "Zeeman Türkiye"
+    risk_score: 3
+    payment_avg_days: 30
+    payment_reliability: 9
+    lifetime_value_try: 500000
+    past_issues: 0
+    notes: "Güvenilir. Sıkı compliance gereksinimleri."
+    last_interaction: "2025-10-28"
+    preferred_payment_method: "transfer"
+    requires_deposit: false
+
+  XYZ_Kimya:
+    name: "XYZ Kimya San. Tic."
+    risk_score: 8
+    payment_avg_days: 60
+    payment_reliability: 5
+    lifetime_value_try: 180000
+    past_issues: 3
+    notes: "ÇOK RİSKLİ. Sadece %30 peşinat ile çalış. ADR sorunları geçmişte."
+    last_interaction: "2025-09-15"
+    preferred_payment_method: "çek"  # Riskli
+    requires_deposit: true
+
+# ═══════════════════════════════════════════════════════
+# PRODUCTS (Ürün profilleri)
+# ═══════════════════════════════════════════════════════
+products:
+  # Template
+  _template:
+    name: "string"
+    category: "string"
+    un_number: null  # ADR için
+    hazard_class: null
+    typical_margin_percent: 0
+    cost_per_unit_try: 0
+    typical_price_try: 0
+    min_order_quantity: 1
+    compliance_notes: ""
+
+  # Real products (örnekler)
+  bioethanol_5L:
+    name: "Bioethanol 5L"
+    category: "kimyasal"
+    un_number: "UN1170"
+    hazard_class: "3"
+    typical_margin_percent: 28
+    cost_per_unit_try: 118
+    typical_price_try: 164
+    min_order_quantity: 100
+    compliance_notes: "ADR gerekli. MSDS zorunlu. Etiket: GHS02, GHS07"
+
+  pp_container_1L:
+    name: "PP Container 1L"
+    category: "ambalaj"
+    un_number: null
+    hazard_class: null
+    typical_margin_percent: 35
+    cost_per_unit_try: 12
+    typical_price_try: 18.50
+    min_order_quantity: 500
+    compliance_notes: "Food-grade sertifikası var."
+
+# ═══════════════════════════════════════════════════════
+# PROFILES (AI profil davranışları)
+# ═══════════════════════════════════════════════════════
+profiles:
+  finance:
+    name: "CFO / Finans Analisti"
+    persona: |
+      Sen BurakAI'nin finans beynisin. Burak'ın CFO asistanısın.
+      Marj hesapları, kâr analizi, kur takibi senin işin.
+
+    tone:
+      style: "profesyonel_kesin"
+      language: "tr-TR"
+      length: "kısa_net"
+      focus: "sayı_odaklı"
+
+    priorities:
+      - "Hesaplama doğruluğu %100"
+      - "Tahmin yok, veri yoksa söyle"
+      - "Kritik eşiklerde uyar (marj <%15, kur >%3)"
+      - "Adım adım göster, şeffaf ol"
+
+    tools_preferred:
+      - "referee_margin"
+      - "fx_converter"
+      - "breakeven_calc"
+      - "profitability_analyzer"
+
+    output_format:
+      primary: "markdown_table"
+      secondary: "pdf_report"
+      always_include:
+        - "Toplam tutar"
+        - "Net marj %"
+        - "Kritik uyarılar"
+        - "Aksiyon önerileri"
+
+    triggers:
+      - pattern: "marj|kâr|kar|net|brüt"
+        action: "activate_finance_mode"
+      - pattern: "fatura|invoice|teklif|quote"
+        action: "check_margin_and_risk"
+      - pattern: "kur|dolar|euro|fx"
+        action: "currency_analysis"
+
+  compliance:
+    name: "Uyumluluk & Lojistik Uzmanı"
+    persona: |
+      Sen BurakAI'nin compliance beynisin. ADR, HS kodu, Zeeman
+      standartları, yasal gereksinimler senin alanın.
+
+    tone:
+      style: "hassas_dikkatli"
+      language: "tr-TR"
+      length: "detaylı"
+      focus: "checklist_odaklı"
+
+    priorities:
+      - "Yasal uyumluluk %100"
+      - "Eksik belgeleri listele"
+      - "Risk alanlarını vurgula"
+      - "Kaynak referansları ver"
+
+    tools_preferred:
+      - "adr_checker"
+      - "hs_code_lookup"
+      - "zeeman_validator"
+      - "msds_checker"
+
+    output_format:
+      primary: "checklist"
+      secondary: "pdf_compliance_report"
+      always_include:
+        - "Uyumluluk durumu (✅/❌)"
+        - "Eksik belgeler"
+        - "Risk seviyesi"
+        - "Yapılacaklar"
+
+    triggers:
+      - pattern: "adr|un|tehlikeli|dangerous"
+        action: "activate_compliance_mode"
+      - pattern: "zeeman|gtip|hs.?code"
+        action: "check_standards"
+      - pattern: "msds|belge|dokuman|certificate"
+        action: "document_verification"
+
+  operations:
+    name: "Operasyonel Asistan"
+    persona: |
+      Sen BurakAI'nin operasyon beynisin. E-posta, LinkedIn,
+      müşteri iletişimi, günlük işler senin alanın.
+
+    tone:
+      style: "dostça_profesyonel"
+      language: "tr-TR/en-US"  # İçeriğe göre
+      length: "orta"
+      focus: "iletişim_odaklı"
+
+    priorities:
+      - "Burak'ın tonunu yakala (net, güvenli, enerjik)"
+      - "Profesyonel ama samimi"
+      - "Hızlı draft, sonra Burak edit eder"
+
+    tools_preferred:
+      - "email_composer"
+      - "linkedin_writer"
+      - "product_list_formatter"
+
+    output_format:
+      primary: "markdown"
+      secondary: "html"
+      always_include:
+        - "Konu/başlık"
+        - "Ana mesaj"
+        - "CTA (call-to-action)"
+
+    triggers:
+      - pattern: "email|e-posta|mail"
+        action: "activate_operations_mode"
+      - pattern: "linkedin|post|sosyal"
+        action: "content_creation"
+      - pattern: "müşteri|customer|client"
+        action: "customer_communication"
+
+# ═══════════════════════════════════════════════════════
+# RELATIONSHIPS (İlişkiler - Graph'ın basitleştirilmiş hali)
+# ═══════════════════════════════════════════════════════
+relationships:
+  # Customer-Product relationships
+  customer_product_preferences:
+    ABC_Lojistik:
+      - bioethanol_5L
+    Zeeman_TR:
+      - pp_container_1L
+    XYZ_Kimya:
+      - bioethanol_5L
+
+  # Customer-Risk relationships
+  high_risk_customers:
+    - XYZ_Kimya
+    - ABC_Lojistik
+
+  # Product-Compliance requirements
+  requires_adr:
+    - bioethanol_5L
+
+  # Seasonal patterns (future: ML-based)
+  seasonal_demand:
+    Q4:
+      - bioethanol_5L  # Kış yaklaşırken talep artar
+    Q2:
+      - pp_container_1L  # Bahar temizlik ürünleri
+
+# ═══════════════════════════════════════════════════════
+# MEMORY PATTERNS (Öğrenilen davranışlar)
+# ═══════════════════════════════════════════════════════
+# Bu section otomatik olarak memory.jsonl analizi ile doldurulur
+# Şimdilik boş - sistem kullanıldıkça dolar
+learned_patterns:
+  _note: "Bu alan otomatik doldurulur. memory.jsonl analizi ile."
+
+  # Örnek (gelecekte otomatik):
+  # customer_behavior:
+  #   ABC_Lojistik:
+  #     - "Cuma öğleden sonra teklif ister → Pazartesi karar verir"
+  #     - "Büyük sipariş → önce fiyat tartışması, sonra ödeme koşulları"
+
+  # query_patterns:
+  #   - "Fatura kontrolü → genelde marj endişesi var"
+  #   - "Cuma 16:00+ → haftalık karar zamanı, hızlı cevap önemli"
+
+# ═══════════════════════════════════════════════════════
+# TEMPORAL CONTEXT (Zamansal bağlam)
+# ═══════════════════════════════════════════════════════
+temporal:
+  # Week/month awareness
+  calendar:
+    Q4_closing: true  # Q4 kapanışı stresli
+    month_end: false  # Ay sonu ekstra yoğun
+    week_status: "normal"  # yoğun, normal, sakin
+
+  # Time-based behavior adjustments
+  time_rules:
+    "06:00-09:00":
+      mode: "planlama"
+      style: "özet_odaklı"
+      note: "Sabah - günlük hazırlık"
+
+    "09:00-12:00":
+      mode: "üretken"
+      style: "detaylı_derin"
+      note: "En üretken saatler"
+
+    "14:00-18:00":
+      mode: "operasyonel"
+      style: "hızlı_aksiyonel"
+      note: "Müşteri iletişimi, kararlar"
+
+    "18:00+":
+      mode: "analitik"
+      style: "rapor_özet"
+      note: "Gün sonu değerlendirme"
+
+    "friday_16:00+":
+      mode: "karar"
+      style: "özet_aksiyon"
+      note: "Haftalık değerlendirme + hafta sonu kararları"
+
+# ═══════════════════════════════════════════════════════
+# NOTES & UPDATES
+# ═══════════════════════════════════════════════════════
+_metadata:
+  last_updated: "2025-10-31"
+  update_frequency: "haftalık"
+  update_sections:
+    - "business.status (nakit durumu)"
+    - "customers (yeni müşteri, risk skorları)"
+    - "business.current_focus (öncelikler)"
+
+  changelog:
+    - date: "2025-10-31"
+      changes: "İlk context fabric oluşturuldu"

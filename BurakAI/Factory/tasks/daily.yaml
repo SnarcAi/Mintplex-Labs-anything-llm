@@ -1,0 +1,271 @@
+# ═══════════════════════════════════════════════════════
+# BurakAI - Daily Task Automation
+# ═══════════════════════════════════════════════════════
+# These tasks run automatically every morning at 06:00
+# Goal: Generate value before you even wake up
+# ═══════════════════════════════════════════════════════
+
+schedule:
+  time: "06:00"
+  timezone: "Europe/Istanbul"
+  enabled: true
+
+# ═══════════════════════════════════════════════════════
+# TASKS (Priority order)
+# ═══════════════════════════════════════════════════════
+
+tasks:
+  # ─────────────────────────────────────────────────────
+  # 1. DAILY MARGIN REPORT (Finance - Priority 1)
+  # ─────────────────────────────────────────────────────
+  - id: daily_margin_report
+    name: "Günlük Marj Raporu"
+    profile: finance
+    priority: 1
+    enabled: true
+    estimated_value_try: 2000
+
+    prompt: |
+      Dünkü satış verilerine göre net marj raporu oluştur:
+
+      Veri kaynağı: Factory/datasets/sales_daily.csv (yoksa mock data kullan)
+
+      Rapor içeriği:
+      1. Toplam satış (adet & ciro)
+      2. Ürün bazlı karlılık analizi
+      3. Komisyon, kargo, iade toplamları
+      4. Kur etkisi (dün vs bugün)
+      5. Kritik uyarılar:
+         - Marj <%15 olan ürünler
+         - Zarar eden satışlar
+         - Yüksek iade oranları
+
+      Format: Markdown tablo + özet
+
+    output:
+      format: markdown
+      filename: "margin_report_{date}.md"
+      directory: "Factory/outputs/{date}"
+
+  # ─────────────────────────────────────────────────────
+  # 2. CURRENCY ALERT (Finance - Priority 1)
+  # ─────────────────────────────────────────────────────
+  - id: currency_alert
+    name: "Kur Uyarısı"
+    profile: finance
+    priority: 1
+    enabled: true
+    estimated_value_try: 500
+
+    prompt: |
+      USD, EUR, GBP kurlarını kontrol et (API varsa kullan, yoksa mock):
+
+      1. Dünle karşılaştır
+      2. Değişim >%2 ise UYARI
+      3. Marj etkisini hesapla (ortalama sipariş üzerinden)
+      4. Aksiyon önerisi
+
+      Örnek:
+      - USD: 34.10 → 34.82 (+2.1%) ⚠️
+      - Etki: 5000 adet @ $4.5 sipariş için ~16,200 TRY fark
+      - Öneri: Bu hafta sipariş ver, daha fazla beklem
+
+    output:
+      format: text
+      filename: "fx_alert_{date}.txt"
+      directory: "Factory/outputs/{date}"
+      notify_if: "change > 2%"
+
+  # ─────────────────────────────────────────────────────
+  # 3. LINKEDIN POST (Operations - Priority 2)
+  # ─────────────────────────────────────────────────────
+  - id: daily_linkedin_post
+    name: "LinkedIn İçerik"
+    profile: operations
+    priority: 2
+    enabled: false  # Manuel olarak aktif edebilirsin
+    estimated_value_try: 500
+
+    prompt: |
+      Bugün için LinkedIn postu hazırla:
+
+      Konu havuzu: [e-ticaret, üretim, lojistik, finans, girişimcilik, verimlilik]
+      Konu seç: Rastgele veya güncel olaylara göre
+
+      Stil:
+      - Burak'ın tonu: Net, güvenli, iddialı, enerji dolu
+      - Uzunluk: 120-150 kelime
+      - Emoji: 1-2 adet (abartma)
+      - Hashtag: 4-5 (#eticaret #üretim #entrepreneurship #verimlilik)
+
+      Format:
+      - Dikkat çeken başlık/soru
+      - 2-3 paragraf kısa içerik
+      - Call-to-action veya düşündürücü soru
+      - Hashtagler
+
+    output:
+      format: markdown
+      filename: "linkedin_{date}.md"
+      directory: "Factory/outputs/{date}"
+
+  # ─────────────────────────────────────────────────────
+  # 4. CUSTOMER EMAIL DRAFTS (Operations - Priority 2)
+  # ─────────────────────────────────────────────────────
+  - id: customer_email_drafts
+    name: "Müşteri E-posta Taslakları"
+    profile: operations
+    priority: 2
+    enabled: false  # Manuel aktif et
+    estimated_value_try: 1000
+
+    prompt: |
+      Bekleyen müşteri sorularına yanıt taslakları hazırla:
+
+      Veri kaynağı: Factory/datasets/customer_inbox.jsonl
+      (Yoksa: "Henüz bekleyen e-posta yok" de)
+
+      Her e-posta için:
+      1. Kısa özet (kim, ne istiyor)
+      2. Taslak yanıt (Burak'ın tonunda)
+      3. Gerekli aksiyonlar
+      4. Öncelik (düşük/orta/yüksek)
+
+      Maksimum 5 e-posta işle (öncelik sırasına göre)
+
+    output:
+      format: markdown
+      filename: "emails_{date}.md"
+      directory: "Factory/outputs/{date}"
+
+  # ─────────────────────────────────────────────────────
+  # 5. RISK MONITORING (Finance - Priority 2)
+  # ─────────────────────────────────────────────────────
+  - id: risk_monitoring
+    name: "Risk Takip"
+    profile: finance
+    priority: 2
+    enabled: true
+    estimated_value_try: 1500
+
+    prompt: |
+      Yüksek riskli müşteriler için durum kontrolü:
+
+      Context'ten yüksek riskli müşterileri al (risk_score >= 7)
+
+      Her müşteri için:
+      1. Son etkileşim tarihi (context.yaml'dan)
+      2. Bekleyen ödemeler (varsa)
+      3. Geçmiş sorunlar özeti
+      4. Aksiyon önerisi (takip et/kaparo iste/durdur)
+
+      Çıktı: Öncelik sırasına göre liste
+
+    output:
+      format: markdown
+      filename: "risk_monitor_{date}.md"
+      directory: "Factory/outputs/{date}"
+
+  # ─────────────────────────────────────────────────────
+  # 6. BREAKEVEN TRACKER (Finance - Priority 3)
+  # ─────────────────────────────────────────────────────
+  - id: breakeven_tracker
+    name: "Başabaş Takip"
+    profile: finance
+    priority: 3
+    enabled: false
+    estimated_value_try: 800
+
+    prompt: |
+      Yeni ürünler için breakeven takibi:
+
+      Veri kaynağı: Factory/datasets/new_products.yaml
+      (Yoksa: "Yeni ürün yok" de)
+
+      Her ürün için:
+      1. Başabaş noktası (adet)
+      2. Mevcut satış (son 7 gün)
+      3. Breakeven'e kalan gün (mevcut hızda)
+      4. Risk durumu (çok yavaş/normal/iyi)
+
+      Uyarılar:
+      - Breakeven > 60 gün → Yavaş satış uyarısı
+      - Satış yok → Acil aksiyon gerekli
+
+    output:
+      format: markdown
+      filename: "breakeven_{date}.md"
+      directory: "Factory/outputs/{date}"
+
+  # ─────────────────────────────────────────────────────
+  # 7. COMPLIANCE CHECKLIST (Compliance - Weekly)
+  # ─────────────────────────────────────────────────────
+  - id: compliance_weekly
+    name: "Haftalık Uyumluluk Kontrolü"
+    profile: compliance
+    priority: 2
+    enabled: true
+    estimated_value_try: 1500
+    schedule:
+      days: ["monday"]  # Sadece Pazartesi
+
+    prompt: |
+      Bu haftaki sevkiyatlar için uyumluluk kontrolü:
+
+      Veri kaynağı: Factory/datasets/shipments_weekly.csv
+      (Yoksa: "Bu hafta sevkiyat yok" de)
+
+      Kontroller:
+      1. ADR gerektiren ürünler → MSDS var mı?
+      2. Zeeman sevkiyatları → Etiket/paket standartları OK?
+      3. Eksik belgeler listesi
+      4. Taşıyıcı onayları
+
+      Çıktı: Checklist formatı (✓/✗)
+
+    output:
+      format: markdown
+      filename: "compliance_check_{week}.md"
+      directory: "Factory/outputs/{date}"
+
+  # ─────────────────────────────────────────────────────
+  # 8. DAILY SUMMARY (En son - tüm görevler bittikten sonra)
+  # ─────────────────────────────────────────────────────
+  - id: daily_summary
+    name: "Günlük Özet"
+    profile: operations
+    priority: 4
+    enabled: true
+    estimated_value_try: 500
+    depends_on: "*"  # Tüm görevler bitince çalış
+
+    prompt: |
+      Bugünkü otomatik görevlerin özetini oluştur:
+
+      1. Tamamlanan görevler (✓)
+      2. Başarısız görevler (✗)
+      3. Toplam üretilen değer (TRY)
+      4. Kritik uyarılar (varsa)
+      5. Bugün için manuel aksiyonlar
+      6. Yarın için hatırlatmalar
+
+      Ton: Kısa, net, aksiyon odaklı
+
+    output:
+      format: markdown
+      filename: "daily_summary_{date}.md"
+      directory: "Factory/outputs/{date}"
+      notify: true  # Bu özeti mutlaka bildir
+
+# ═══════════════════════════════════════════════════════
+# VALUE TRACKING
+# ═══════════════════════════════════════════════════════
+# Her görev tamamlandığında estimated_value_try kaydedilir
+# Günlük/haftalık/aylık ROI hesaplanır
+
+value_tracking:
+  enabled: true
+  log_file: "Factory/outputs/value_log.jsonl"
+  daily_target_try: 6000
+  weekly_target_try: 42000
+  monthly_target_try: 180000
