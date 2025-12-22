@@ -47,4 +47,4 @@
 
   *"A fool throws a stone into the well. Let the wise fish it out if they can."*
 
-  — The Protocol, 2024
+  — The Protocol, 2025
