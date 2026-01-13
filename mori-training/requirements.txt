@@ -1,0 +1,31 @@
+# MORİ Fine-Tuning Requirements
+# Python 3.13.7 - Windows 11 Pro - RTX 5080 16GB
+
+# Core ML/DL frameworks
+torch>=2.5.0  # PyTorch with CUDA support
+transformers>=4.47.0  # Hugging Face Transformers
+datasets>=3.2.0  # Hugging Face Datasets
+accelerate>=1.2.0  # Distributed training support
+
+# LoRA & PEFT
+peft>=0.14.0  # Parameter-Efficient Fine-Tuning
+
+# Utilities
+tqdm>=4.67.0  # Progress bars
+numpy>=2.0.0  # Numerical computing
+sentencepiece>=0.2.0  # Tokenization (for some models)
+protobuf>=5.29.0  # Protocol buffers
+
+# Optional but recommended
+tensorboard>=2.18.0  # Training visualization
+safetensors>=0.4.6  # Safe tensor serialization
+
+# Development tools (optional)
+ipython>=8.30.0  # Interactive shell
+jupyter>=1.1.1  # Jupyter notebooks
+
+# Notes:
+# - PyTorch CUDA version için: pip install torch --index-url https://download.pytorch.org/whl/cu121
+# - Windows 11 için önerilen: Python 3.13.7
+# - Minimum GPU: 12GB VRAM (RTX 3060 12GB veya üzeri)
+# - Önerilen GPU: RTX 5080 16GB
